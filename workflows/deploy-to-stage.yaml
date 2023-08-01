@@ -1,0 +1,72 @@
+name: Build and Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main  # Adjust this to match your main branch name
+    paths:
+      - 'concourse-java-maven-test-prj/**'  # Watch for changes in the "adapter" folder and its subdirectories
+
+jobs:
+  build_and_deploy:
+    runs-on: [self-hosted, Linux, X64, nbt-runner]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Java 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.5
+        with:
+          maven-version: 3.8.4
+
+      - name: Determine Changed Applications
+        id: determine_changed_apps
+        run: |
+          changed_apps=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/' | cut -d '/' -f 2 | uniq)
+          echo "::set-output name=changed_apps::${changed_apps}"
+
+      # Get the Git commit ID and use it as the version
+      - name: Get Git commit ID
+        id: get_commit_id
+        run: echo "::set-output name=commit_id::$(git rev-parse --short HEAD)"
+
+      # Rename the JAR with the commit ID as the version
+      # Replace 'your-app.jar' with the actual JAR file name
+      # Replace 'target' with the path to your JAR file's parent directory
+
+
+      - name: Build and Deploy Adapter Apps
+        run: |
+          for app_name in ${{ steps.determine_changed_apps.outputs.changed_apps }}; do
+            echo "Building and deploying $app_name..."
+
+            # Adjust the build command as per your build system (e.g., for Maven)
+            mvn clean install -pl adapter/$app_name/. -am -DskipTests
+
+            # Rename the JAR with the application name as part of the filename
+            # Replace 'your-app.jar' with the actual JAR file name
+            # Replace 'target' with the path to your JAR file's parent directory
+            env:
+              VERSION: ${{ steps.get_commit_id.outputs.commit_id }}
+            mv target/"${app_name}.jar" target/"${app_name}-${VERSION}.jar"
+          done
+
+# #        run: mv target/your-app.jar target/your-app-${VERSION}.jar
+
+#       - name: Deploy JAR to VM
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.STAGE_VM_HOST }}  # Add your VM host address as a secret
+#           username: ${{ secrets.STAGE_SSH_USERNAME }}  # Add your VM username as a secret
+#           password: ${{ secrets.STAGE_SSH_PASSWORD }}  # Add your private SSH key as a secret
+#           script: |
+#             # Replace '/path/to/your/jar/target' with the path to your JAR file on the VM
+#             sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp target/"${app_name}-${VERSION}.jar"  ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/
