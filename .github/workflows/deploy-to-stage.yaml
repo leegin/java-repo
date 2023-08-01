@@ -31,7 +31,7 @@ jobs:
         id: determine_changed_apps
         run: |
           changed_apps=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/' | cut -d '/' -f 2 | uniq)
-          echo "::set-output name=changed_apps::${changed_apps}"
+          echo "APPS=${changed_apps}" >> $GITHUB_ENV
 
       # Get the Git commit ID and use it as the version
       - name: Get Git commit ID
@@ -45,7 +45,7 @@ jobs:
 
       - name: Build and Deploy Adapter Apps
         run: |
-          for app_name in ${{ steps.determine_changed_apps.outputs.changed_apps }}; do
+          for app_name in $APPS; do
             echo "Building and deploying $app_name..."
 
             # Adjust the build command as per your build system (e.g., for Maven)
