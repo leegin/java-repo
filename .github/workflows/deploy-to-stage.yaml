@@ -5,7 +5,7 @@ on:
     branches:
       - main  # Adjust this to match your main branch name
     paths:
-      - 'concourse-java-maven-test-prj/**'  # Watch for changes in the "adapter" folder and its subdirectories
+      - 'adapters/**'  # Watch for changes in the "adapter" folder and its subdirectories
 
 jobs:
   build_and_deploy:
@@ -43,21 +43,22 @@ jobs:
       # Replace 'target' with the path to your JAR file's parent directory
 
 
-      - name: Build and Deploy Adapter Apps
-        run: |
-          for app_name in ${{ steps.determine_changed_apps.outputs.changed_apps }}; do
-            echo "Building and deploying $app_name..."
+#       - name: Build and Deploy Adapter Apps
+#         run: |
+#           for app_name in ${{ steps.determine_changed_apps.outputs.changed_apps }}; do
+#             echo "Building and deploying $app_name..."
 
-            # Adjust the build command as per your build system (e.g., for Maven)
-            mvn clean install -pl adapter/$app_name/. -am -DskipTests
+#             # Adjust the build command as per your build system (e.g., for Maven)
+# #            mvn clean install -pl adapter/$app_name/. -am -DskipTests
+            
 
-            # Rename the JAR with the application name as part of the filename
-            # Replace 'your-app.jar' with the actual JAR file name
-            # Replace 'target' with the path to your JAR file's parent directory
-            env:
-              VERSION: ${{ steps.get_commit_id.outputs.commit_id }}
-            mv target/"${app_name}.jar" target/"${app_name}-${VERSION}.jar"
-          done
+#             # Rename the JAR with the application name as part of the filename
+#             # Replace 'your-app.jar' with the actual JAR file name
+#             # Replace 'target' with the path to your JAR file's parent directory
+#             env:
+#               VERSION: ${{ steps.get_commit_id.outputs.commit_id }}
+#             mv target/"${app_name}.jar" target/"${app_name}-${VERSION}.jar"
+#           done
 
 # #        run: mv target/your-app.jar target/your-app-${VERSION}.jar
 
