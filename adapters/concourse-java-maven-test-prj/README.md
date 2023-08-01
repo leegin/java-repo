@@ -22,7 +22,7 @@ mvn package
 
 # prepare vagrant box
 vagrant init concourse/lite
-vagrant up 1
+vagrant up
 
 # upload pipeline
 fly -t local set-pipeline -p concourse-java-maven-test-prj -c ./pipeline.yml
