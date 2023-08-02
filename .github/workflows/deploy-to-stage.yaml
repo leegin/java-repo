@@ -35,8 +35,8 @@ jobs:
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/')
           if [ -n "$changed_files" ]; then
             # Extract unique -adapter/-server subdirectories from the changed paths
-            apps=$(echo "$changed_files" | grep -oE 'adapters/[^/]+/[^/]+/' | uniq)
-            echo "APPS=$apps" >> $GITHUB_ENV
+            echo "$changed_files" | grep -oE 'adapters/[^/]+/[^/]+/' | uniq  >> $GITHUB_ENV
+            echo "APPS=$(echo "$changed_files" | grep -oE 'adapters/[^/]+/[^/]+/' | uniq)"
           else
             echo "No applications with changes. Exiting the workflow."
             exit 0
