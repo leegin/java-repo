@@ -80,4 +80,4 @@ jobs:
           password: ${{ secrets.STAGE_SSH_PASSWORD }}  # Add your private SSH key as a secret
           script: |
             # Replace '/path/to/your/jar/target' with the path to your JAR file on the VM
-            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"  ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/home/tp-runner/
+            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp -P 20202 target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"  ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/home/tp-runner/
