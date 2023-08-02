@@ -35,8 +35,7 @@ jobs:
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/')
           if [ -n "$changed_files" ]; then
             # Extract unique -adapter/-server subdirectories from the changed paths
-            echo "$changed_files" | grep -oE 'adapters/[^/]+/[^/]+/' | uniq  >> $GITHUB_ENV
-            echo "APPS=$(echo "$changed_files" | grep -oE 'adapters/[^/]+/[^/]+/' | uniq)"
+            echo "$changed_files" | grep -oE 'adapters/[^/]+/[^/]+/' | uniq  > changed_files.txt
           else
             echo "No applications with changes. Exiting the workflow."
             exit 0
@@ -55,7 +54,7 @@ jobs:
 
       - name: Build and Deploy Adapter Apps
         run: |
-          for app_name in $APPS; do
+          for app_name in $(cat changed_files.txt); do
             echo "Building and deploying $app_name..."
 
             cd $app_name
