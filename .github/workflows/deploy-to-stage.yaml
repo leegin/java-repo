@@ -65,7 +65,7 @@ jobs:
             # Adjust the build command as per your build system (e.g., for Maven)
             mvn clean install -am
 
-            APP_WITHOUT_PARENT=$(echo $app_name | cut -d'/' -f2)            
+            APP_WITHOUT_PARENT=$(echo $app_name | cut -d'/' -f2)  >> $GITHUB_ENV          
 
             mv target/"${APP_WITHOUT_PARENT}-parent-1.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"
             cd ../../..
