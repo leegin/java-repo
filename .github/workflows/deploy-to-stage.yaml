@@ -5,7 +5,7 @@ on:
     branches:
       - main  # Adjust this to match your main branch name
     paths:
-      - 'adapters/**'  # Watch for changes in the "adapter" folder and its subdirectories
+      - 'adapters/*-adapter/*-server/**'  # Watch for changes in the "adapter" folder and its subdirectories
 
 jobs:
   build_and_deploy:
@@ -32,7 +32,7 @@ jobs:
       - name: Determine Changed Applications
         id: determine_changed_apps
         run: |
-          changed_apps=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/' | cut -d '/' -f 2-3 | uniq)
+          changed_apps=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/.*-adapter/.*-server/' | cut -d '/' -f 2-3 | uniq)
           echo "APPS=${changed_apps}" >> $GITHUB_ENV
 
       # Get the Git commit ID and use it as the version
@@ -53,12 +53,12 @@ jobs:
             cd adapters/$app_name
 
             # Adjust the build command as per your build system (e.g., for Maven)
-            mvn clean install -am -DskipTests
+            mvn clean install -am
 
             APP_WITHOUT_PARENT=$(echo $app_name | cut -d'/' -f2)            
 
             mv target/"${APP_WITHOUT_PARENT}-1.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-$COMMIT_ID-1.0-SNAPSHOT.jar"
-            cd ../..
+            cd ../../..
           done
 
 # #        run: mv target/your-app.jar target/your-app-${VERSION}.jar
