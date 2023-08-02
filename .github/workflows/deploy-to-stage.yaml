@@ -32,8 +32,16 @@ jobs:
       - name: Determine Changed Applications
         id: determine_changed_apps
         run: |
-          changed_apps=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/.*-adapter/.*-server/' | cut -d '/' -f 2-3 | uniq)
-          echo "APPS=${changed_apps}" >> $GITHUB_ENV
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/.*-adapter/.*-server/')
+          if [ -n "$changed_files" ]; then
+            # Extract unique -adapter/-server subdirectories from the changed paths
+            apps=$(echo "$changed_files" | cut -d'/' -f2-3 | uniq)
+            export APPS=$apps
+            echo "APPS=$apps" >> $GITHUB_ENV
+          else
+            echo "No applications with changes. Exiting the workflow."
+            exit 0
+          fi
 
       # Get the Git commit ID and use it as the version
       - name: Get Git commit ID
