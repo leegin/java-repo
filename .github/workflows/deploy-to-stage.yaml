@@ -50,8 +50,10 @@ jobs:
           for app_name in $APPS; do
             echo "Building and deploying $app_name..."
 
+            cd adapters/$app_name
+
             # Adjust the build command as per your build system (e.g., for Maven)
-            mvn clean install -pl adapters/$app_name -am -DskipTests
+            mvn clean install -pl -am -DskipTests
 
   
             
@@ -62,6 +64,7 @@ jobs:
             env:
               VERSION: $COMMIT_ID
             mv target/"${app_name}.jar" target/"${app_name}-${VERSION}.jar"
+            cd ../..
           done
 
 # #        run: mv target/your-app.jar target/your-app-${VERSION}.jar
