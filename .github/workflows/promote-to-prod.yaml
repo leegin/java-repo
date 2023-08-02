@@ -1,0 +1,27 @@
+name: Promote to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      staging_artifact_version:
+        description: 'The version of the artifact from the staging deployment'
+        required: true
+
+jobs:
+  promote_to_production:
+    runs-on: [self-hosted, Linux, X64, nbt-runner]
+
+    steps:
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+
+      # Use the same commit ID as the version for the production deployment
+      - name: Deploy to Production
+        run: |
+          # Replace '/path/to/your/production/jar/target' with the path to your production JAR file on the VM
+          scp target/your-app-${{ inputs.staging_artifact_version }}.jar ${SSH_USERNAME}@${PRODUCTION_HOST}:/path/to/your/production/jar/target

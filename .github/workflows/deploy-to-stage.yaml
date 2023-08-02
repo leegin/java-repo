@@ -51,7 +51,7 @@ jobs:
             echo "Building and deploying $app_name..."
 
             # Adjust the build command as per your build system (e.g., for Maven)
-            mvn clean install -pl $app_name -am -DskipTests
+            mvn clean install -pl adapters/$app_name -am -DskipTests
 
   
             
