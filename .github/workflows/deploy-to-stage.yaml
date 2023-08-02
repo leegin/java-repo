@@ -32,7 +32,7 @@ jobs:
       - name: Determine Changed Applications
         id: determine_changed_apps
         run: |
-          changed_apps=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/' | cut -d '/' -f 2 | uniq)
+          changed_apps=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/' | cut -d '/' -f 2-3 | uniq)
           echo "APPS=${changed_apps}" >> $GITHUB_ENV
 
       # Get the Git commit ID and use it as the version
