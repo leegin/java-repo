@@ -35,7 +35,7 @@ jobs:
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/.*-adapter/.*-server/')
           if [ -n "$changed_files" ]; then
             # Extract unique -adapter/-server subdirectories from the changed paths
-            apps=$(echo "$changed_files" | cut -d'/' -f2-3 | uniq)
+            apps=$(echo "$changed_files" | grep -oE 'adapters/[^/]+/[^/]+/' | uniq)
             echo "APPS=$apps" >> $GITHUB_ENV
           else
             echo "No applications with changes. Exiting the workflow."
@@ -50,19 +50,20 @@ jobs:
       # Rename the JAR with the commit ID as the version
       # Replace 'your-app.jar' with the actual JAR file name
       # Replace 'target' with the path to your JAR file's parent directory
-
+      - name: Set Apps Environment Variable
+        run: echo "APPS=${{ env.APPS }}" >> $GITHUB_ENV
 
       - name: Build and Deploy Adapter Apps
         run: |
           for app_name in $APPS; do
             echo "Building and deploying $app_name..."
 
-            cd adapters/$app_name
+            cd $app_name
 
             # Adjust the build command as per your build system (e.g., for Maven)
             mvn clean install -am
 
-            APP_WITHOUT_PARENT=$(echo $app_name | cut -d'/' -f2)            
+            APP_WITHOUT_PARENT=$(echo $app_name | cut -d'/' -f3)            
 
             mv target/"${APP_WITHOUT_PARENT}-1.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-$COMMIT_ID-1.0-SNAPSHOT.jar"
             cd ../../..
