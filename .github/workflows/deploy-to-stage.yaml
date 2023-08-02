@@ -38,7 +38,7 @@ jobs:
       # Get the Git commit ID and use it as the version
       - name: Get Git commit ID
         id: get_commit_id
-        run: echo "::set-output name=commit_id::$(git rev-parse --short HEAD)"
+        run: echo "COMMIT_ID=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       # Rename the JAR with the commit ID as the version
       # Replace 'your-app.jar' with the actual JAR file name
@@ -51,7 +51,7 @@ jobs:
             echo "Building and deploying $app_name..."
 
             # Adjust the build command as per your build system (e.g., for Maven)
-            mvn clean install -pl $app_name/. -am -DskipTests
+            mvn clean install -pl $app_name -am -DskipTests
 
   
             
@@ -60,7 +60,7 @@ jobs:
             # Replace 'your-app.jar' with the actual JAR file name
             # Replace 'target' with the path to your JAR file's parent directory
             env:
-              VERSION: ${{ steps.get_commit_id.outputs.commit_id }}
+              VERSION: $COMMIT_ID
             mv target/"${app_name}.jar" target/"${app_name}-${VERSION}.jar"
           done
 
