@@ -65,7 +65,7 @@ jobs:
 
             APP_WITHOUT_PARENT=$(echo $app_name | cut -d'/' -f3)            
 
-            mv target/"${APP_WITHOUT_PARENT}-1.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-$COMMIT_ID-1.0-SNAPSHOT.jar"
+            mv target/"${APP_WITHOUT_PARENT}-parent-1.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"
             cd ../../..
           done
 
