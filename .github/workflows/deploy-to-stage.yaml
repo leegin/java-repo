@@ -29,6 +29,9 @@ jobs:
         with:
           maven-version: 3.8.4
 
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
       - name: Determine Changed Applications
         id: determine_changed_apps
         run: |
