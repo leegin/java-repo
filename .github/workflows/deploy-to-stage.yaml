@@ -55,15 +55,7 @@ jobs:
             # Adjust the build command as per your build system (e.g., for Maven)
             mvn clean install -am -DskipTests
 
-  
-            
-
-            # Rename the JAR with the application name as part of the filename
-            # Replace 'your-app.jar' with the actual JAR file name
-            # Replace 'target' with the path to your JAR file's parent directory
-            env:
-              VERSION: $COMMIT_ID
-            mv target/"${app_name}.jar" target/"${app_name}-${VERSION}.jar"
+            mv target/"${app_name}.jar" target/"${app_name}-$COMMIT_ID.jar"
             cd ../..
           done
 
