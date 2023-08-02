@@ -81,7 +81,7 @@ jobs:
           username: ${{ secrets.STAGE_SSH_USERNAME }}  # Add your VM username as a secret
           password: ${{ secrets.STAGE_SSH_PASSWORD }}  # Add your private SSH key as a secret
           port: 20202
-          source: ~/actions-runner/_work/java-repo/java-repo/adapters/github-action-maven-adapter/github-action-maven-server/target/"${APP_WITHOUT_PARENT}-parent-${COMMIT_ID}-1.0-SNAPSHOT.jar"
+          source: ~/actions-runner/_work/java-repo/java-repo/adapters/github-action-maven-adapter/github-action-maven-server/target/${APP_WITHOUT_PARENT}-parent-${COMMIT_ID}-1.0-SNAPSHOT.jar
           target: /home/tp-runner/
 #          script: |
             # Replace '/path/to/your/jar/target' with the path to your JAR file on the VM
