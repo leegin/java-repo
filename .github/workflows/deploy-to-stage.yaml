@@ -30,7 +30,7 @@ jobs:
           maven-version: 3.8.4
 
       - name: Install sshpass
-        run: sudo apt-get update && sudo apt-get install -y sshpass
+        run: sudo apt-get update -y && sudo apt-get install -y sshpass
 
       - name: Determine Changed Applications
         id: determine_changed_apps
@@ -73,12 +73,14 @@ jobs:
 
 
       - name: Deploy JAR to VM
-        uses: appleboy/ssh-action@master
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.STAGE_VM_HOST }}  # Add your VM host address as a secret
           username: ${{ secrets.STAGE_SSH_USERNAME }}  # Add your VM username as a secret
           password: ${{ secrets.STAGE_SSH_PASSWORD }}  # Add your private SSH key as a secret
           port: 20202
-          script: |
+          source: target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"
+          target: /home/tp-runner/
+#          script: |
             # Replace '/path/to/your/jar/target' with the path to your JAR file on the VM
-            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"  ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/home/tp-runner/
+#            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"  ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/home/tp-runner/
