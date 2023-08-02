@@ -69,20 +69,20 @@ jobs:
 
             mv target/"${APP_WITHOUT_PARENT}-parent-1.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"
 
-            echo "APP_WITHOUT_PARENT=${APP_WITHOUT_PARENT}" >> $GITHUB_ENV
+            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp -P 20202 target/"${APP_WITHOUT_PARENT}-parent-${COMMIT_ID}-1.0-SNAPSHOT.jar" ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/home/tp-runner/
             cd ../../..
           done
 
 
-      - name: Deploy JAR to VM
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.STAGE_VM_HOST }}  # Add your VM host address as a secret
-          username: ${{ secrets.STAGE_SSH_USERNAME }}  # Add your VM username as a secret
-          password: ${{ secrets.STAGE_SSH_PASSWORD }}  # Add your private SSH key as a secret
-          port: 20202
-          source: ~/actions-runner/_work/java-repo/java-repo/adapters/github-action-maven-adapter/github-action-maven-server/target/${APP_WITHOUT_PARENT}-parent-${COMMIT_ID}-1.0-SNAPSHOT.jar
-          target: /home/tp-runner/
+      # - name: Deploy JAR to VM
+      #   uses: appleboy/scp-action@master
+      #   with:
+      #     host: ${{ secrets.STAGE_VM_HOST }}  # Add your VM host address as a secret
+      #     username: ${{ secrets.STAGE_SSH_USERNAME }}  # Add your VM username as a secret
+      #     password: ${{ secrets.STAGE_SSH_PASSWORD }}  # Add your private SSH key as a secret
+      #     port: 20202
+      #     source: ~/actions-runner/_work/java-repo/java-repo/adapters/github-action-maven-adapter/github-action-maven-server/target/${APP_WITHOUT_PARENT}-parent-${COMMIT_ID}-1.0-SNAPSHOT.jar
+      #     target: /home/tp-runner/
 #          script: |
             # Replace '/path/to/your/jar/target' with the path to your JAR file on the VM
 #            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"  ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/home/tp-runner/
