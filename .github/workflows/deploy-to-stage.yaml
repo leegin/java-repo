@@ -55,7 +55,7 @@ jobs:
             # Adjust the build command as per your build system (e.g., for Maven)
             mvn clean install -am -DskipTests
 
-            mv target/"${app_name}.jar" target/"${app_name}-$COMMIT_ID.jar"
+            mv target/"${app_name}-1.0-SNAPSHOT.jar" target/"${app_name}-$COMMIT_ID-1.0-SNAPSHOT.jar"
             cd ../..
           done
 
