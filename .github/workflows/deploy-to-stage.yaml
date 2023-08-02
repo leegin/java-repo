@@ -68,14 +68,13 @@ jobs:
             cd ../../..
           done
 
-# #        run: mv target/your-app.jar target/your-app-${VERSION}.jar
 
-#       - name: Deploy JAR to VM
-#         uses: appleboy/ssh-action@master
-#         with:
-#           host: ${{ secrets.STAGE_VM_HOST }}  # Add your VM host address as a secret
-#           username: ${{ secrets.STAGE_SSH_USERNAME }}  # Add your VM username as a secret
-#           password: ${{ secrets.STAGE_SSH_PASSWORD }}  # Add your private SSH key as a secret
-#           script: |
-#             # Replace '/path/to/your/jar/target' with the path to your JAR file on the VM
-#             sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp target/"${app_name}-${VERSION}.jar"  ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/
+      - name: Deploy JAR to VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.STAGE_VM_HOST }}  # Add your VM host address as a secret
+          username: ${{ secrets.STAGE_SSH_USERNAME }}  # Add your VM username as a secret
+          password: ${{ secrets.STAGE_SSH_PASSWORD }}  # Add your private SSH key as a secret
+          script: |
+            # Replace '/path/to/your/jar/target' with the path to your JAR file on the VM
+            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"  ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/home/tp-runner/
