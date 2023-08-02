@@ -53,7 +53,7 @@ jobs:
             cd adapters/$app_name
 
             # Adjust the build command as per your build system (e.g., for Maven)
-            mvn clean install -pl -am -DskipTests
+            mvn clean install -am -DskipTests
 
   
             
