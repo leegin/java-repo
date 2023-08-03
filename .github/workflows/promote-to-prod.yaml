@@ -25,4 +25,4 @@ jobs:
         run: |
           # Replace '/path/to/your/production/jar/target' with the path to your production JAR file on the VM
           echo "Workflow triggered by: ${{ github.actor }}"
-          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 adapters/*/target/${{ inputs.staging_artifact_version }} ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/
+          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/
