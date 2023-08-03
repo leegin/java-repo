@@ -1,0 +1,17 @@
+name: Check User Permission
+
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: 'GitHub username'
+        required: true
+
+jobs:
+  check_permission:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check User Permission
+        uses: tfutils/actions/github/check_permission@v1
+        with:
+          username: ${{ github.event.inputs.username }}

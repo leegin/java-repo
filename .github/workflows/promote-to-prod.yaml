@@ -11,14 +11,22 @@ permissions:
   # Define the users or teams who are allowed to run the promote workflow manually
   # Replace 'username1', 'team1', etc. with the actual GitHub usernames or team names
   # Ensure to use the exact names as they appear on GitHub (case-sensitive)
-  users:
-    - leegin
+  promote_workflow:
+    users:
+      - leegin
 
 jobs:
   promote_to_production:
+    if: steps.check_permission.outputs.allowed == 'true'
     runs-on: [self-hosted, Linux, X64, nbt-runner]
 
     steps:
+      - name: Check User Permission
+        uses: ./.github/workflows/permission.yml
+        with:
+          username: ${{ github.actor }}
+        id: check_permission
+        
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
