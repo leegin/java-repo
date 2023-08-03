@@ -13,7 +13,6 @@ on:
 
 jobs:
   promote_to_production:
-    if: steps.check_permission.outputs.allowed == 'true'
     runs-on: [self-hosted, Linux, X64, nbt-runner]
 
     steps:
