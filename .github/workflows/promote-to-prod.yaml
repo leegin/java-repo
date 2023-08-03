@@ -7,6 +7,13 @@ on:
         description: 'The version of the artifact from the staging deployment'
         required: true
 
+permissions:
+  # Define the users or teams who are allowed to run the promote workflow manually
+  # Replace 'username1', 'team1', etc. with the actual GitHub usernames or team names
+  # Ensure to use the exact names as they appear on GitHub (case-sensitive)
+  users:
+    - leegin
+
 jobs:
   promote_to_production:
     runs-on: [self-hosted, Linux, X64, nbt-runner]
@@ -23,6 +30,25 @@ jobs:
       # Use the same commit ID as the version for the production deployment
       - name: Deploy to Production
         run: |
+          
+          ARTIFACT=${{ inputs.staging_artifact_version }}
+          APP_WITHOUT_PARENT="${ARTIFACT%-parent*}"
+
           # Replace '/path/to/your/production/jar/target' with the path to your production JAR file on the VM
           echo "Workflow triggered by: ${{ github.actor }}"
+
+          # scp the jar to the remote vm in PROD Environment
+
           sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/prod
+
+          #Trigger the service restart
+          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "/opt/${APP_WITHOUT_PARENT}-server-startup.sh"
+
+          #Check if the service is running or not.
+          SERVICE_NAME="${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"
+          if sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "pgrep -f $SERVICE_NAME"; then
+            echo "Service $SERVICE_NAME is running."
+          else
+            echo "Service $SERVICE_NAME is not running."
+            exit 1
+          fi
