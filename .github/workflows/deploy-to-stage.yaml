@@ -69,8 +69,10 @@ jobs:
 
             mv target/"${APP_WITHOUT_PARENT}-parent-1.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"
             sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 target/"${APP_WITHOUT_PARENT}-parent-${COMMIT_ID}-1.0-SNAPSHOT.jar" ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/github-action-maven-adapter/
+            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -tt ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "sudo /opt/${APP_WITHOUT_PARENT}-server-startup.sh"
             cd ../../..
           done
+
 
 
       # - name: Deploy JAR to VM
