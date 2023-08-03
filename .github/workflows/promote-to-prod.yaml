@@ -9,7 +9,7 @@ on:
 
 jobs:
   promote_to_production:
-    if: github.actor == 'leegin' && github.actor == 'Leegin-darknight'
+    if: github.actor == 'leegin' || github.actor == 'Leegin-darknight'
     runs-on: [self-hosted, Linux, X64, nbt-runner]
 
     steps:
