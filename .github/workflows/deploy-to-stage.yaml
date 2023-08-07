@@ -27,6 +27,7 @@ jobs:
           
           ARTIFACT=${{ inputs.staging_artifact_version }}
           APP_WITHOUT_PARENT="${ARTIFACT%-parent*}"
+          SERVICE_NAME="${APP_WITHOUT_PARENT%-adapter*}"
 
           # Replace '/path/to/yourjar/target' with the path to your production JAR file on the VM
           echo "Workflow triggered by: ${{ github.actor }}"
@@ -36,12 +37,12 @@ jobs:
           sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/github-action-maven-adapter/
 
           #Trigger the service restart
-          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "sudo systemctl restart ${APP_WITHOUT_PARENT}-server.service"
+          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "sudo systemctl restart ${SERVICE_NAME}-server.service"
 
           #Check if the service is running or not.
           if sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "pgrep -f $ARTIFACT"; then
-            echo "Service $APP_WITHOUT_PARENT is running."
+            echo "Service ${SERVICE_NAME}-server is running."
           else
-            echo "Service $APP_WITHOUT_PARENT is not running."
+            echo "Service ${SERVICE_NAME}-server is not running."
             exit 1
           fi
