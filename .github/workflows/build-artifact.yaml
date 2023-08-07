@@ -67,7 +67,7 @@ jobs:
             mv target/"${APP_WITHOUT_PARENT}-parent-1.0.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
             
             
-            mvn deploy:deploy-file \
+            mvn deploy:deploy-file -X \
               -Durl="${{ secrets.NEXUS_URL }}" \
               -DrepositoryId=groww-artifacts-snapshot \
               -Dfile=target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar" \
