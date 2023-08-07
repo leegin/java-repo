@@ -66,10 +66,10 @@ jobs:
       - name: Set Apps Environment Variable
         run: echo "APPS=${{ env.APPS }}" >> $GITHUB_ENV
 
-      - name: Build and Deploy Adapter Apps
+      - name: Build Adapter Apps
         run: |
           for app_name in $(cat changed_files.txt); do
-            echo "Building and deploying $app_name..."
+            echo "Building $app_name..."
 
             cd $app_name
 
@@ -81,7 +81,7 @@ jobs:
             mv target/"${APP_WITHOUT_PARENT}-parent-1.0.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
             
             
-            mvn deploy:deploy-file -X \
+            mvn deploy:deploy-file \
               -Durl="${{ secrets.NEXUS_URL }}" \
               -Dfile=target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar" \
               -DgroupId=com.groww.trading-platform.adapters \
