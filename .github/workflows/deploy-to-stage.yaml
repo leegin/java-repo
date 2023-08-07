@@ -37,6 +37,7 @@ jobs:
           sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/github-action-maven-adapter/
 
           #Trigger the service restart
+          echo "Restarting the service ${SERVICE_NAME}-server"
           sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "sudo systemctl restart ${SERVICE_NAME}-server.service"
 
           #Check if the service is running or not.
