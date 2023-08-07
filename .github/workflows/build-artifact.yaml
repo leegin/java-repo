@@ -16,7 +16,7 @@ on:
 
   push:
     branches:
-      - ${{ github.event.inputs.branch }}  # Use the branch input parameter
+      - ${{ inputs.branch }}  # Use the branch input parameter
     paths:
       - 'adapters/*-adapter/*-server/**' 
 
