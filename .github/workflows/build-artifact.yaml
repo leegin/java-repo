@@ -14,20 +14,21 @@ on:
         description: 'Branch name'
         required: true
 
-  push:
-    branches:
-      - ${{ inputs.branch }}  # Use the branch input parameter
-    paths:
-      - 'adapters/*-adapter/*-server/**' 
 
 jobs:
   build_artifact:
+    strategy:
+      matrix:
+        path: ['adapters/*-adapter/*-server/']
     runs-on: [self-hosted, Linux, X64, nbt-runner]
+    env:
+      BRANCH: ${{ github.event.inputs.branch }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
+          ref: ${{ env.BRANCH }}
           fetch-depth: 0
 
       - name: Set up Java 11
