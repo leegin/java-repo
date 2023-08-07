@@ -14,11 +14,11 @@ on:
         description: 'Branch name'
         required: true
 
-  push:
-    branches:
-      - ${{ github.event.inputs.branch }}  # Use the branch input parameter
-    paths:
-      - 'adapters/*-adapter/*-server/**' 
+  # push:
+  #   branches:
+  #     - ${{ github.event.inputs.branch }}  # Use the branch input parameter
+  #   paths:
+  #     - 'adapters/*-adapter/*-server/**' 
 
 jobs:
   build_artifact:
