@@ -66,6 +66,7 @@ jobs:
 
             mv target/"${APP_WITHOUT_PARENT}-parent-1.0.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
 
+            echo "The built artifact is ${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
             # # scp the jar to the remote vm in staging Environment
             # sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 target/"${APP_WITHOUT_PARENT}-parent-${COMMIT_ID}-1.0.0-SNAPSHOT.jar" ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/github-action-maven-adapter/
             
