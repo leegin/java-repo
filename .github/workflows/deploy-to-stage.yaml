@@ -1,102 +1,47 @@
-name: Build and Deploy to Staging
+name: Deploy to Stage
 
 on:
-  push:
-    branches:
-      - main  # Adjust this to match your main branch name
-    paths:
-      - 'adapters/*-adapter/*-server/**'  # Watch for changes in the "adapter" folder and its subdirectories
+  workflow_dispatch:
+    inputs:
+      staging_artifact_version:
+        description: 'The version of the artifact that was build.'
+        required: true
 
 jobs:
-  build_and_deploy:
+  promote_to_production:
+    if: github.actor == 'leegin' || github.actor == 'Leegin-darknight'
     runs-on: [self-hosted, Linux, X64, nbt-runner]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java 11
-        uses: actions/setup-java@v3
+      - name: Set up Java
+        uses: actions/setup-java@v2
         with:
           java-version: '11'
           distribution: 'temurin'
           cache: maven
 
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.5
-        with:
-          maven-version: 3.8.4
 
-      - name: Install sshpass
-        run: sudo apt-get update -y && sudo apt-get install -y sshpass
-
-      - name: Determine Changed Applications
-        id: determine_changed_apps
+      # Use the same commit ID as the version for the production deployment
+      - name: Deploy to staging
         run: |
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/')
-          if [ -n "$changed_files" ]; then
-            # Extract unique -adapter/-server subdirectories from the changed paths
-            echo "$changed_files" | grep -oE 'adapters/[^/]+/[^/]+/' | uniq  > changed_files.txt
+          
+          ARTIFACT=${{ inputs.staging_artifact_version }}
+          APP_WITHOUT_PARENT="${ARTIFACT%-parent*}"
+
+          # Replace '/path/to/yourjar/target' with the path to your production JAR file on the VM
+          echo "Workflow triggered by: ${{ github.actor }}"
+
+          # scp the jar to the remote vm in PROD Environment
+
+          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/github-action-maven-adapter/
+
+          #Trigger the service restart
+          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "/opt/${APP_WITHOUT_PARENT}-server-startup.sh"
+
+          #Check if the service is running or not.
+          if sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "pgrep -f $ARTIFACT"; then
+            echo "Service $APP_WITHOUT_PARENT is running."
           else
-            echo "No applications with changes. Exiting the workflow."
-            exit 0
+            echo "Service $APP_WITHOUT_PARENT is not running."
+            exit 1
           fi
-
-      # Get the Git commit ID and use it as the version
-      - name: Get Git commit ID
-        id: get_commit_id
-        run: echo "COMMIT_ID=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-      # Rename the JAR with the commit ID as the version
-      # Replace 'your-app.jar' with the actual JAR file name
-      # Replace 'target' with the path to your JAR file's parent directory
-      - name: Set Apps Environment Variable
-        run: echo "APPS=${{ env.APPS }}" >> $GITHUB_ENV
-
-      - name: Build and Deploy Adapter Apps
-        run: |
-          for app_name in $(cat changed_files.txt); do
-            echo "Building and deploying $app_name..."
-
-            cd $app_name
-
-            # Adjust the build command as per your build system (e.g., for Maven)
-            mvn clean install -am
-
-            APP_WITHOUT_PARENT=$(echo $app_name | cut -d'/' -f2)        
-
-            mv target/"${APP_WITHOUT_PARENT}-parent-1.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"
-
-            # scp the jar to the remote vm in staging Environment
-            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 target/"${APP_WITHOUT_PARENT}-parent-${COMMIT_ID}-1.0-SNAPSHOT.jar" ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/github-action-maven-adapter/
-            
-            #Trigger the service restart
-            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "/opt/${APP_WITHOUT_PARENT}-server-startup.sh"
-
-            #Check if the service is running or not.
-            SERVICE_NAME="${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"
-            if sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "pgrep -f $SERVICE_NAME"; then
-              echo "Service $SERVICE_NAME is running."
-            else
-              echo "Service $SERVICE_NAME is not running."
-              exit 1
-            fi
-            cd ../../..
-          done
-
-
-
-      # - name: Deploy JAR to VM
-      #   uses: appleboy/scp-action@master
-      #   with:
-      #     host: ${{ secrets.STAGE_VM_HOST }}  # Add your VM host address as a secret
-      #     username: ${{ secrets.STAGE_SSH_USERNAME }}  # Add your VM username as a secret
-      #     password: ${{ secrets.STAGE_SSH_PASSWORD }}  # Add your private SSH key as a secret
-      #     port: 20202
-      #     source: ~/actions-runner/_work/java-repo/java-repo/adapters/github-action-maven-adapter/github-action-maven-server/target/${APP_WITHOUT_PARENT}-parent-${COMMIT_ID}-1.0-SNAPSHOT.jar
-      #     target: /home/tp-runner/
-#          script: |
-            # Replace '/path/to/your/jar/target' with the path to your JAR file on the VM
-#            sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" scp target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0-SNAPSHOT.jar"  ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/home/tp-runner/
