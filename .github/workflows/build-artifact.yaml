@@ -48,6 +48,12 @@ jobs:
         with:
           maven-version: 3.8.4
 
+      - name: Debug Info
+        run: |
+          echo "Current Directory: $(pwd)"
+          echo "Git Diff Output:"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^${{ matrix.path }}'
+
       - name: Determine Changed Applications
         id: determine_changed_apps
         run: |
