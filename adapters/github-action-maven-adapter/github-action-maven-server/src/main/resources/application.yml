@@ -1,0 +1,53 @@
+endpoints:
+  prometheus:
+    sensitive: false
+    
+micronaut:
+  server:
+    port: 8080
+  executors:
+    consumer:
+      type: ${CONSUMER_EXECUTOR_TYPE:fixed}
+      numberOfThreads: ${CONSUMER_EXECUTOR_NO_OF_THREADS:24} #for type FIXED
+      parallelism: ${CONSUMER_EXECUTOR_PARALLELISM:24} # for type WORK_STEALING
+      threadFactoryClass: gw.platform.support.nats.ConsumerThreadFactory
+    scheduled:
+      type: scheduled
+      core-pool-size: 60
+  metrics:
+    enabled: true
+    export:
+      prometheus:
+        enabled: true
+        step: PT1M
+        descriptions: false
+
+serverCount: 1
+
+logger:
+  levels:
+    gw.platform: DEBUG
+
+nsecm.adapter.nats: true
+
+nse-cm-order-adapter:
+  traderId: 44449
+  branchId: 1
+  ctclUserId: 44449
+  brokerId: '90187'
+  workstationId: 1
+  boxId: 10312
+  gatewayIp: '172.19.245.107'
+  gatewayPort: 10263
+  versionNumber: 75500
+  password: CREDENTIAL
+  newPassword: ''
+  fullWorkstationID: '7540001'
+  orderPerSecond: 995
+  reloginAttemptLimit: 3
+  reloginWaitTimeInMillis: 1000
+
+nats:
+  addresses:
+    - "nats://${NATS_SERVER_HOST:localhost}:${NATS_SERVER_PORT:4222}"
+

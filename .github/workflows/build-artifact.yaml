@@ -46,6 +46,10 @@ jobs:
         with:
           maven-version: 3.8.4
 
+      - name: Update Password
+        run: |
+          sed -i "s/CREDENTIAL/${{ secrets.APP_PASSWORD }}/g" "adapters/${{ env.ADAPTER_PATH }}/*-server/src/main/resources/application.yml"
+
       # - name: Debug Info
       #   run: |
       #     echo "Current Directory: $(pwd)"
