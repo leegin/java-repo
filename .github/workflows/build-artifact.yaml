@@ -13,21 +13,19 @@ on:
       branch:
         description: 'Branch name'
         required: true
-
-  # push:
-  #   branches:
-  #     - ${{ github.event.inputs.branch }}  # Use the branch input parameter
-  #   paths:
-  #     - 'adapters/*-adapter/*-server/**' 
+      adapter_path:
+        description: 'Adapter path'
+        required: true
 
 jobs:
   build_artifact:
-    strategy:
-      matrix:
-        path: ['adapters/*-adapter/*-server/'] 
+    # strategy:
+    #   matrix:
+    #     path: [''] 
     runs-on: [self-hosted, Linux, X64, nbt-runner]
     env:
       BRANCH: ${{ github.event.inputs.branch }}
+      ADAPTER_PATH: ${{ github.event.inputs.adapter_path }}
 
     steps:
       - name: Checkout code
@@ -48,16 +46,16 @@ jobs:
         with:
           maven-version: 3.8.4
 
-      - name: Debug Info
-        run: |
-          echo "Current Directory: $(pwd)"
-          echo "Git Diff Output:"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^${{ matrix.path }}'
+      # - name: Debug Info
+      #   run: |
+      #     echo "Current Directory: $(pwd)"
+      #     echo "Git Diff Output:"
+      #     git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^${{ matrix.path }}'
 
       - name: Determine Changed Applications
         id: determine_changed_apps
         run: |
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^${{ matrix.path }}')
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^adapters/${{ env.ADAPTER_PATH }}/*-server/')
           if [ -n "$changed_files" ]; then
             # Extract unique -adapter/-server subdirectories from the changed paths
             echo "$changed_files" | grep -oE 'adapters/[^/]+/[^/]+/' | uniq  > changed_files.txt
