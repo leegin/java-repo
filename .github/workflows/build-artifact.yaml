@@ -48,7 +48,7 @@ jobs:
 
       - name: Update Password
         run: |
-          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} 'sed -i "s/CREDENTIAL/'"${{ secrets.APP_PASSWORD }}"'/g" /opt/'"${{ env.ADAPTER_PATH }}"'/application.yml'
+          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "sed -i 's/CREDENTIAL/\"${{ secrets.APP_PASSWORD }}\"/g' /opt/${{ env.ADAPTER_PATH }}/application.yml"
 
       # - name: Debug Info
       #   run: |
