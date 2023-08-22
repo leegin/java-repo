@@ -106,6 +106,14 @@ jobs:
               -DrepositoryUsername=${{ secrets.NEXUS_USERNAME }} \
               -DrepositoryPassword=${{ secrets.NEXUS_PASSWORD }}
 
+            NEX_PASS=$NEXUS_PASSWORD
+            NEX_USER=$NEXUS_USERNAME
+            NEX_URL=$NEXUS_URL
+
+            echo $NEX_PASS
+            echo $NEX_USER
+            echo $NEX_URL
+
             echo "The built artifact is ${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
             cd ../../..
           done
