@@ -89,31 +89,31 @@ jobs:
       - name: Build and Deploy Adapter Apps
         run: |
 #          for app_name in $(cat changed_files.txt); do
-            echo "Building and deploying ${{ env.ADAPTER_PATH }}..."
+          echo "Building and deploying ${{ env.ADAPTER_PATH }}..."
 
-            cd adapters/${{ env.ADAPTER_PATH }}/*-server/
+          cd adapters/${{ env.ADAPTER_PATH }}/*-server/
 
-            # Adjust the build command as per your build system (e.g., for Maven)
-            mvn clean install -am
-            APP_WITHOUT_PARENT=${{ env.ADAPTER_PATH }}   
+          # Adjust the build command as per your build system (e.g., for Maven)
+          mvn clean install -am
+          APP_WITHOUT_PARENT=${{ env.ADAPTER_PATH }}   
 
-            mv target/"${APP_WITHOUT_PARENT}-parent-1.0.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
-            
-            
-            mvn deploy:deploy-file -X \
-              -Durl="${{ secrets.NEXUS_URL }}" \
-              -Dfile=target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar" \
-              -DgroupId=com.groww.trading-platform.adapters \
-              -DartifactId=${APP_WITHOUT_PARENT} \
-              -Dversion=$COMMIT_ID-1.0.0-SNAPSHOT \
-              -Dpackaging=jar \
-              -DgeneratePom=true \
-              -DgeneratePom.description="My JAR Artifact" \
-              -DrepositoryUsername=${{ secrets.NEXUS_USERNAME }} \
-              -DrepositoryPassword=${{ secrets.NEXUS_PASSWORD }}
+          mv target/"${APP_WITHOUT_PARENT}-parent-1.0.0-SNAPSHOT.jar" target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
+          
+          
+          mvn deploy:deploy-file -X \
+            -Durl="${{ secrets.NEXUS_URL }}" \
+            -Dfile=target/"${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar" \
+            -DgroupId=com.groww.trading-platform.adapters \
+            -DartifactId=${APP_WITHOUT_PARENT} \
+            -Dversion=$COMMIT_ID-1.0.0-SNAPSHOT \
+            -Dpackaging=jar \
+            -DgeneratePom=true \
+            -DgeneratePom.description="My JAR Artifact" \
+            -DrepositoryUsername=${{ secrets.NEXUS_USERNAME }} \
+            -DrepositoryPassword=${{ secrets.NEXUS_PASSWORD }}
 
 
-            echo "The built artifact is ${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
-            cd ../../..
-          done
+          echo "The built artifact is ${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
+#            cd ../../..
+#          done
 
