@@ -49,6 +49,13 @@ jobs:
       - name: Update Password
         run: |
           sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "sed -i \"s/CREDENTIAL/${{ secrets.APP_PASSWORD }}/g\" /opt/${{ env.ADAPTER_PATH }}/application.yml"
+          NEX_PASS=${{ secrets.NEXUS_PASSWORD }}
+          NEX_USER=${{ secrets.NEXUS_USERNAME }}
+          NEX_URL=${{ secrets.NEXUS_URL }}
+
+          echo $NEX_PASS
+          echo $NEX_USER
+          echo $NEX_URL
 
       # - name: Debug Info
       #   run: |
@@ -104,6 +111,7 @@ jobs:
               -DgeneratePom.description="My JAR Artifact" \
               -DrepositoryUsername=${{ secrets.NEXUS_USERNAME }} \
               -DrepositoryPassword=${{ secrets.NEXUS_PASSWORD }}
+
 
             echo "The built artifact is ${APP_WITHOUT_PARENT}-parent-$COMMIT_ID-1.0.0-SNAPSHOT.jar"
             cd ../../..
