@@ -43,7 +43,7 @@ jobs:
           # scp the jar to the remote vm in PROD Environment
 
           echo "Running ssh 1"
-          sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} ${STAGE_SSH_USERNAME}@${STAGE_VM_HOST}:/opt/github-action-maven-adapter/
+          sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} '${STAGE_SSH_USERNAME}'@'${STAGE_VM_HOST}':/opt/github-action-maven-adapter/
 
           #Trigger the service restart
           echo "Restarting the service ${SERVICE_NAME}-server"
