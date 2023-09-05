@@ -34,6 +34,9 @@ jobs:
           APP_WITHOUT_PARENT="${ARTIFACT%-parent*}"
           SERVICE_NAME="${APP_WITHOUT_PARENT%-adapter*}"
 
+          echo $STAGE_VM_HOST
+          echo $STAGE_SSH_USERNAME
+
           # Replace '/path/to/yourjar/target' with the path to your production JAR file on the VM
           echo "Workflow triggered by: ${{ github.actor }}"
 
@@ -43,7 +46,7 @@ jobs:
           # scp the jar to the remote vm in PROD Environment
 
           echo "Running ssh 1"
-          sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} '${STAGE_SSH_USERNAME}'@'${STAGE_VM_HOST}':/opt/github-action-maven-adapter/
+          sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} $STAGE_SSH_USERNAME@$STAGE_VM_HOST:/opt/github-action-maven-adapter/
 
           #Trigger the service restart
           echo "Restarting the service ${SERVICE_NAME}-server"
