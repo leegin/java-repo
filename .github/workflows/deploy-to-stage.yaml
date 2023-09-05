@@ -20,6 +20,11 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Decrypt Secrets
+        run: |
+          sops --decrypt adapters/secrets_enc.yaml > secrets.yaml
+          source secrets.yaml
+
 
       # Use the same commit ID as the version for the production deployment
       - name: Deploy to staging
@@ -32,16 +37,19 @@ jobs:
           # Replace '/path/to/yourjar/target' with the path to your production JAR file on the VM
           echo "Workflow triggered by: ${{ github.actor }}"
 
+          ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${STAGE_SSH_USERNAME}@${STAGE_VM_HOST} "sed -i \"/password/c\  password: '${STAGE_NEW_ADAPTER}'\" /opt/${APP_WITHOUT_PARENT}-adapter/application.yml"
+        
+
           # scp the jar to the remote vm in PROD Environment
 
-          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }}:/opt/github-action-maven-adapter/
+          sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} ${STAGE_SSH_USERNAME}@${STAGE_VM_HOST}:/opt/github-action-maven-adapter/
 
           #Trigger the service restart
           echo "Restarting the service ${SERVICE_NAME}-server"
-          sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "echo ${{ secrets.STAGE_SSH_PASSWORD }} | sudo -S systemctl restart ${SERVICE_NAME}-server"
+          ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${STAGE_SSH_USERNAME}@${STAGE_VM_HOST} "sudo -S systemctl restart ${SERVICE_NAME}-server"
 
           #Check if the service is running or not.
-          if sshpass -p "${{ secrets.STAGE_SSH_PASSWORD }}" ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.STAGE_SSH_USERNAME }}@${{ secrets.STAGE_VM_HOST }} "pgrep -f $ARTIFACT"; then
+          if ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${STAGE_SSH_USERNAME}@${STAGE_VM_HOST} "pgrep -f $ARTIFACT"; then
             echo "Service ${SERVICE_NAME}-server is running."
           else
             echo "Service ${SERVICE_NAME}-server is not running."
