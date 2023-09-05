@@ -42,6 +42,7 @@ jobs:
 
           # scp the jar to the remote vm in PROD Environment
 
+          echo "Running ssh 1"
           sudo scp -P 20202 adapters/*/*/target/${{ inputs.staging_artifact_version }} ${STAGE_SSH_USERNAME}@${STAGE_VM_HOST}:/opt/github-action-maven-adapter/
 
           #Trigger the service restart
@@ -49,6 +50,7 @@ jobs:
           ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${STAGE_SSH_USERNAME}@${STAGE_VM_HOST} "sudo -S systemctl restart ${SERVICE_NAME}-server"
 
           #Check if the service is running or not.
+          echo "Running ssh 2"
           if ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${STAGE_SSH_USERNAME}@${STAGE_VM_HOST} "pgrep -f $ARTIFACT"; then
             echo "Service ${SERVICE_NAME}-server is running."
           else
