@@ -23,7 +23,7 @@ jobs:
       - name: Decrypt Secrets
         run: |
           sops --decrypt adapters/secrets_enc.yaml > secrets.yaml
-          source secrets.yaml
+          eval $(awk -F': ' '{print "export " $1"="$2}' secrets.yaml)
 
 
       # Use the same commit ID as the version for the production deployment
