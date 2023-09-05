@@ -35,13 +35,12 @@ jobs:
           SERVICE_NAME="${APP_WITHOUT_PARENT%-adapter*}"
 
           echo "$STAGE_VM_HOST"
-          echo $STAGE_SSH_USERNAME
+          echo "$STAGE_SSH_USERNAME"
 
           # Replace '/path/to/yourjar/target' with the path to your production JAR file on the VM
           echo "Workflow triggered by: ${{ github.actor }}"
 
           # Update the password in application.yml
-          ssh -p 20202 -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${STAGE_SSH_USERNAME}@${STAGE_VM_HOST} "sed -i \"/password/c\  password: '${STAGE_NEW_ADAPTER}'\" /opt/github-action-maven-adapter/application.yml"
 
           # scp the jar to the remote vm in PROD Environment
 
