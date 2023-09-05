@@ -34,8 +34,8 @@ jobs:
           APP_WITHOUT_PARENT="${ARTIFACT%-parent*}"
           SERVICE_NAME="${APP_WITHOUT_PARENT%-adapter*}"
 
-          echo "$STAGE_VM_HOST"
-          echo "$STAGE_SSH_USERNAME"
+          echo "${STAGE_VM_HOST}"
+          echo "${STAGE_SSH_USERNAME}"
 
           # Replace '/path/to/yourjar/target' with the path to your production JAR file on the VM
           echo "Workflow triggered by: ${{ github.actor }}"
